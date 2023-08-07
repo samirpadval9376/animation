@@ -8,7 +8,49 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+  late AnimationController animationController;
+  late AnimationController textController;
+
+  late Animation rotation;
+  late Animation text;
+  List texts = ["data1,data2,"];
+
+  @override
+  void initState() {
+    super.initState();
+
+    animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(
+        seconds: 10,
+      ),
+    );
+
+    textController = AnimationController(
+      vsync: this,
+      duration: const Duration(
+        seconds: 10,
+      ),
+    );
+
+    rotation = Tween(
+      begin: 0.0,
+      end: 2 * pi,
+    ).animate(
+      animationController,
+    );
+
+    text = IntTween(
+      begin: 0,
+      end: 1,
+    ).animate(
+      textController,
+    );
+
+    animationController.forward();
+  }
+
   @override
   Widget build(BuildContext context) {
     Size s = MediaQuery.of(context).size;
@@ -17,12 +59,13 @@ class _HomePageState extends State<HomePage> {
       height: double.infinity,
       width: double.infinity,
       decoration: const BoxDecoration(
-          image: DecorationImage(
-        fit: BoxFit.fill,
-        image: AssetImage(
-          "assets/images/stars.jpg",
+        image: DecorationImage(
+          fit: BoxFit.fill,
+          image: AssetImage(
+            "assets/images/stars.jpg",
+          ),
         ),
-      )),
+      ),
       child: Scaffold(
         body: Padding(
           padding: const EdgeInsets.all(20),
@@ -30,21 +73,14 @@ class _HomePageState extends State<HomePage> {
             children: [
               Expanded(
                 flex: 10,
-                child: TweenAnimationBuilder(
-                  duration: const Duration(
-                    seconds: 10,
-                  ),
-                  curve: Curves.easeInOut,
-                  tween: Tween(
-                    begin: 0.0,
-                    end: 2 * pi,
-                  ),
-                  builder: (context, val, _) {
+                child: AnimatedBuilder(
+                  animation: animationController,
+                  builder: (context, child) {
                     return Transform.translate(
                       // offset: Offset(30, -90),
                       offset: Offset(-130, -90),
                       child: Transform.rotate(
-                        angle: val,
+                        angle: rotation.value,
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
@@ -229,51 +265,11 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
               ),
-              Expanded(
-                child: AnimatedDefaultTextStyle(
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  duration: const Duration(
-                    seconds: 20,
-                  ),
-                  child: TweenAnimationBuilder(
-                    duration: const Duration(
-                      seconds: 10,
-                    ),
-                    tween: Tween(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
-                    builder: (context, val, _) {
-                      return Align(
-                        alignment: val,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: s.width,
-                                child: const Text("data1"),
-                              ),
-                              Container(
-                                width: s.width,
-                                child: const Text("data2"),
-                              ),
-                              Container(
-                                width: s.width,
-                                child: const Text("data3"),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
+              AnimatedBuilder(
+                animation: textController,
+                builder: (context, child) {
+                  return Text("data");
+                },
               ),
             ],
           ),
